@@ -109,6 +109,7 @@ bool export_fucker::hook( uintptr_t hook_addr, std::string function_name )
 	// Call find_code_cave for find a place for our shellcode
 	uintptr_t code_cave_addr = export_fucker::find_code_cave( );
 
+
 	// If there's no place return false
 	if ( !code_cave_addr )
 		return false;
