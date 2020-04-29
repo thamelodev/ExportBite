@@ -113,11 +113,11 @@ bool export_fucker::hook( uintptr_t hook_addr, std::string function_name )
 	if ( !code_cave_addr )
 		return false;
 	
-	// JMP Shellcode intialized
-	char shellcode [ ] = { '\xE9', '\x00', '\x00', '\x00', '\x00' };
+	// PUSH + ADDDRESS  + RET Shellcode intialized
+	char shellcode [ ] = { '\x68', '\x00', '\x00', '\x00', '\x00', '\xC3' };
 
 	// Place the address on shellcode
-	*reinterpret_cast< uintptr_t* >( ( char* ) shellcode + 1 ) = hook_addr;
+	memcpy( shellcode + 1, &hook_addr, sizeof( int32_t ) );
 
 	// Stores the old protection
 	DWORD old_protect = { 0 };
@@ -127,7 +127,7 @@ bool export_fucker::hook( uintptr_t hook_addr, std::string function_name )
 		return false;
 
 	// Copy the shellcode to code_cave
-	memcpy( reinterpret_cast< void* >( code_cave_addr ), shellcode, 5 );
+	memcpy( reinterpret_cast< void* >( code_cave_addr ), shellcode, 6 );
 
 	// Change the protection to EXECUTE because I'll let the .text as it was before.
 	if ( !VirtualProtect( reinterpret_cast< char* >( export_fucker::dos_header ), export_fucker::module_size, PAGE_EXECUTE, &old_protect ) )
@@ -162,14 +162,14 @@ uintptr_t export_fucker::find_code_cave( )
 		return false;
 
 
-	// Find a code cave for place JMP + Adddress
+	// Find a code cave for place PUSH + ADDRESS + RET
 	for ( size_t i = export_fucker::module_size + reinterpret_cast<int32_t>(export_fucker::dos_header); i > 0; i -= 5 )
 	{
 		// Intializes the mem buffer
 		char mem_bytes [ 5 ] = { 0 };
 
 		// Shellcode with 5 null-bytes XD idk why i did this
-		char shellcode [ 5 ] = { '\x00', '\x00', '\x00', '\x00', '\x00' };
+		char shellcode [ 6 ] = { '\x00', '\x00', '\x00', '\x00', '\x00', '\x00' };
 
 		// Copy the memory area to the mem buffer
 		memcpy( &mem_bytes, reinterpret_cast< char* >( i ), 5 );
