@@ -114,7 +114,7 @@ bool export_fucker::hook( uintptr_t hook_addr, std::string function_name )
 	if ( !code_cave_addr )
 		return false;
 
-	// PUSH + ADDDRESS  + RET Shellcode intialized
+	// MOV EAX, ADDRESS + CALL EAX + RET
 	char shellcode [ ] = { '\xB8', '\x00', '\x00', '\x00', '\x00', '\xFF', '\xD0', '\xC3' };
 
 	// Place the address on shellcode
